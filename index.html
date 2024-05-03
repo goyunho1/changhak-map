@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>창학관 </title>
+</head>
+<body>
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d089c7cdc529dee06cb3eb318a5f010a"></script>
+	<div id="map" style="width:100%;height: 600px; float: left;"></div>
+
+	<div style="clear: both;"></div>
+
+	<div style="float: left; width: 40%; height:1000px;">
+		<div>
+			<br><br><br><br>
+			<p>해결해야 할것 <br><br>
+
+			1. 줌을 더 당기고 싶음, 실제 지도에 넣으려면 조금 더 줌 당겨야 적당. : https://devtalk.kakao.com/t/topic/35624/2<br>
+			2. geolocation API(GPS기반)를 사용해서 위치를 받아오는건데 https에서만 지원, 테스트용 서버 아직 http라서 안됨.<br>
+			3. 지도를 회전시키는 기능이 웹에는 없음, 학교 건물들은 각 맞춰서 한방향으로 지어져 있어서 지도를 회전시키거나 덮어씌울 실내지도를 회전시켜야 됨 <br>
+			4. 줌 레벨 변경시에 실내지도(이미지)가 일시적으로 안보임.<br><br>
+			
+				
+			-> 건물 옆에 상호작용 가능한 버튼 넣어서 누르면 실내지도로 전환 <br>
+			-> 
+			<br><br>
+			</p>
+		</div>
+		<div>
+			<p>구현해야 할것<br><br>
+
+				1. 마커 <br>
+				2. https 지원하는 서버<br>
+				3. AP를 통해 받아온 위치 정보 값을 통해서 마커, 중심 위치 조정<br>
+				4. 층이 바뀌면 실내 지도 변경<br>
+				5. 클릭 이벤트로 강의실 시간표 등등 정보 띄우기
+			</p>
+		</div>
+		
+	</div>
+	<div style="clear: both;"></div>
+
+
+	
+	<script>
+		
+	var 창학관좌표 = [37.63246442452321, 127.07955672789472]; //좌표 기본값
+	var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = { 
+        center: new kakao.maps.LatLng(창학관좌표[0], 창학관좌표[1]), // 지도의 중심좌표
+        level: 0 // 지도의 확대 레벨
+    };
+
+	var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+	// 오버레이로 올릴 이미지의 bounds를 받아 AbstractOverlay를 생성합니다.
+	function GroundOverlay(bounds, imgSrc) {
+		this.bounds = bounds;
+		var node = this.node = document.createElement('div');
+		node.className = 'node';
+	
+		var img = this.img = document.createElement('img');
+		img.style.position = 'absolute';
+		img.src = imgSrc;
+		
+		node.appendChild(img);
+	}
+
+	GroundOverlay.prototype = new kakao.maps.AbstractOverlay;
+		
+	GroundOverlay.prototype.onAdd = function() {
+		var panel = this.getPanels().overlayLayer;
+		panel.appendChild(this.node);
+	};
+
+	// 줌인 아웃 시 이미지를 원하는 bounds값에 맞게 표출하기 위해 img style을 정의 및 선언합니다.
+	GroundOverlay.prototype.draw = function() {
+		var projection = this.getProjection();
+		var ne = projection.pointFromCoords(this.bounds.getNorthEast());
+		var sw = projection.pointFromCoords(this.bounds.getSouthWest());
+		
+		var width = ne.x - sw.x;
+		var height = sw.y - ne.y;  
+		
+		this.img.style.top = ne.y+'px';
+		this.img.style.left = sw.x+'px';
+		this.img.style.width = width+'px';
+		this.img.style.height = height+'px';
+	}
+		
+	GroundOverlay.prototype.onRemove = function() {
+		this.node.parentNode.removeChild(this.node);
+	};
+
+	// LatLng, LatLngBounds 를 사용하는 코드로 변경해야 함.37.502, 127.026581
+	var sw = new kakao.maps.LatLng(창학관좌표[0]-0.00085, 창학관좌표[1]-0.00065);
+		ne = new kakao.maps.LatLng(창학관좌표[0]+0.0009, 창학관좌표[1]+0.00063);
+		0.00018
+	var bounds = new kakao.maps.LatLngBounds(sw, ne);
+		
+	var overlay = new GroundOverlay(bounds, 'https://changhak.netlify.app/img/map2.png');
+	overlay.setMap(map);
+
+
+
+
+
+	// 마커가 표시될 위치입니다 (좌표 기본값)
+	var markerPosition  = new kakao.maps.LatLng(창학관좌표[0], 창학관좌표[1]); 
+
+	// 마커를 생성합니다
+	var marker = new kakao.maps.Marker({
+		position: markerPosition
+	});
+	var markerFlg = true;
+
+	// 마커가 지도 위에 표시되도록 설정합니다
+	marker.setMap(map);
+
+
+
+
+	//--------------------------------------------------------//
+	//실내로 들어오면 1,	신호가 기준값보다 크면 실내로 판단
+	var isIndoor
+	if (신호 > 기준값) {
+    	isIndoor = 1;
+		getPresentPosition();
+
+	} 
+	else {
+		isIndoor = 0;
+	}
+
+	//--------------------------------------------------------//
+	//					실내 위치 정보		   				   //
+	//--------------------------------------------------------//
+	function 위치불러오기() {
+		if (isIndoor) {
+			markerPosition = new kakao.maps.LatLng(); 
+		}
+		else {
+
+		}
+
+	}
+
+
+	
+	
+	//--------------------------------------------------------//
+	//					GPS기반 위치 정보		   			   //
+	//--------------------------------------------------------//
+
+	// HTML5의 geolocation으로 사용할 수 있는지 확인합니다 
+	if (navigator.geolocation) {
+		
+		// GeoLocation을 이용해서 접속 위치를 얻어옵니다
+		var watchId = navigator.geolocation.watchPosition(
+			(position) => {
+				var lat = position.coords.latitude, // 위도
+					lon = position.coords.longitude; // 경도
+	
+				var locPosition = new kakao.maps.LatLng(lat, lon)// 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
+				if (markerFlg) {
+					marker.setMap(null); // 기존 마커 삭제
+					marker = new kakao.maps.Marker({
+					position: locPosition
+					});
+				}
+			},
+			(positionErr) => {
+				console.log(err.message);
+			},
+			{ enableHighAccuracy: true, maximumAge: 0, timeout: 3000 }
+		);	
+	} 
+	else { // HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
+		
+		var locPosition = new kakao.maps.LatLng(창학관좌표[0],창학관좌표[1]),    
+			message = 'geolocation을 사용할수 없어요..'
+			
+		displayMarker(locPosition, message);
+	}
+
+	// 지도에 마커와 인포윈도우를 표시하는 함수입니다
+	// function displayMarker(locPosition, message) {
+
+	// 	// 마커를 생성합니다
+	// 	var marker = new kakao.maps.Marker({  
+	// 		map: map, 
+	// 		position: locPosition
+	// 	}); 
+		
+	// 	var iwContent = message, // 인포윈도우에 표시할 내용
+	// 		iwRemoveable = true;
+
+	// 	// 인포윈도우를 생성합니다
+	// 	var infowindow = new kakao.maps.InfoWindow({
+	// 		content : iwContent,
+	// 		removable : iwRemoveable
+	// 	});
+		
+	// 	// 인포윈도우를 마커위에 표시합니다 
+	// 	infowindow.open(map, marker);
+		
+	// 	// 지도 중심좌표를 접속위치로 변경합니다
+	// 	map.setCenter(locPosition);      
+	// }    
+	// 지도 줌 레벨 변경 이벤트를 감지하고, 이벤트 발생 시 오버레이된 이미지를 다시 그립니다.
+
+
+
+
+
+
+	//python -m http.server 8080
+
+	</script>
+</body>
+</html>
+
+	
+
+
