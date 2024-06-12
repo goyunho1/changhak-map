@@ -8,6 +8,7 @@
 	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d089c7cdc529dee06cb3eb318a5f010a"></script>
 	<div id="map" style="width:100%;height: 600px; float: left;"></div>
 	<div id="clickLatlng"></div>
+	<div>hi</div>
 	<script>
 		
 	var 창학관좌표 = [37.63246442452321, 127.07955672789472]; //좌표 기본값
@@ -59,13 +60,12 @@
 	};
 
 	// LatLng, LatLngBounds 를 사용하는 코드로 변경해야 함.37.502, 127.026581
-	var sw = new kakao.maps.LatLng(창학관좌표[0]-0.00043, 창학관좌표[1]-0.00065);
-		ne = new kakao.maps.LatLng(창학관좌표[0]+0.00031, 창학관좌표[1]+0.00055);
-		0.00018
+	var sw = new kakao.maps.LatLng(창학관좌표[0]-0.00044, 창학관좌표[1]-0.00064);
+		ne = new kakao.maps.LatLng(창학관좌표[0]+0.00030, 창학관좌표[1]+0.00055);
 	var bounds = new kakao.maps.LatLngBounds(sw, ne);
 		
 	// var overlay = new GroundOverlay(bounds, 'https://github.com/goyunho1/changhak-map/blob/main/img/map3f.png?raw=true');
-	var overlay = new GroundOverlay(bounds, 'img/3ff.png');
+	var overlay = new GroundOverlay(bounds, 'img/ff.png');
 	overlay.setMap(map);
 
 
@@ -93,7 +93,7 @@
 		// 마커 위치를 클릭한 위치로 옮깁니다
 		marker.setPosition(latlng);
 		
-		var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+		var message = '_____________________________________________클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
 		message += '경도는 ' + latlng.getLng() + ' 입니다';
 		
 		var resultDiv = document.getElementById('clickLatlng'); 
