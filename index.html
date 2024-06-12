@@ -65,7 +65,7 @@
 	var bounds = new kakao.maps.LatLngBounds(sw, ne);
 		
 	// var overlay = new GroundOverlay(bounds, 'https://github.com/goyunho1/changhak-map/blob/main/img/map3f.png?raw=true');
-	var overlay = new GroundOverlay(bounds, 'img/map3f.png');
+	var overlay = new GroundOverlay(bounds, 'img/3ff.png');
 	overlay.setMap(map);
 
 
@@ -80,6 +80,8 @@
 		position: markerPosition
 	});
 	var markerFlg = true;
+	// 지도에 마커를 표시합니다
+	marker.setMap(map);
 
 	// 지도에 클릭 이벤트를 등록합니다
 	// 지도를 클릭하면 마지막 파라미터로 넘어온 함수를 호출합니다
