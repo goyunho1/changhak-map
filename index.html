@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-<!-- 
+	<!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
+
 	<meta charset="utf-8"/>
-	 -->
-	<title>창학관 </title>
+	
+	<title> 창학관 </title>
 </head>
 <body>
 	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d089c7cdc529dee06cb3eb318a5f010a"></script>
@@ -107,18 +107,6 @@
 		var resultDiv = document.getElementById('clickLatlng'); 
 		resultDiv.innerHTML = message;		
 	});
-
-
-
-
-	async function getData() {
-		const url = "http://43.200.135.167/changhak/signals?cell=1";
-		const response = await fetch(url);
-		const data = await response.json();
-		console.log(data);
-	}
-	getData();
-
 
 
 
